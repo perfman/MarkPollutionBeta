@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <TextView
+        android:text="This is the title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageViewAvatarFeed"
+        android:layout_toEndOf="@+id/imageViewAvatarFeed"
+        android:layout_marginLeft="23dp"
+        android:layout_marginStart="23dp"
+        android:id="@+id/textViewTitleFeed"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="normal|bold"
+        android:textColor="@color/cast_intro_overlay_background_color"/>
+
+    <TextView
+        android:text="hh:mm:ss dd/MM/yyyy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewTitleFeed"
+        android:layout_alignLeft="@+id/textViewTitleFeed"
+        android:layout_alignStart="@+id/textViewTitleFeed"
+        android:id="@+id/textViewTimeFeed"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/sym_def_app_icon"
+        android:id="@+id/imageViewAvatarFeed"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:text="This is the description This is the description This is the description This is the description This is the description This is the description This is the description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageViewAvatarFeed"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="13dp"
+        android:lines="3"
+        android:id="@+id/textViewDescFeed"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/sym_def_app_icon"
+        android:layout_below="@+id/textViewDescFeed"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/imageViewPictureFeed"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:text="999"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="11dp"
+        android:id="@+id/textViewRateFeed"
+        android:textStyle="normal|italic"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_rate"
+        android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_toLeftOf="@+id/textViewRateFeed"
+        android:layout_toStartOf="@+id/textViewRateFeed"
+        android:id="@+id/imageViewRateFeed"
+        android:layout_marginRight="4dp"/>
+
+    <TextView
+        android:text="999"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textViewRateFeed"
+        android:layout_toLeftOf="@+id/imageViewRateFeed"
+        android:layout_toStartOf="@+id/imageViewRateFeed"
+        android:layout_marginRight="19dp"
+        android:layout_marginEnd="19dp"
+        android:id="@+id/textViewCommentFeed"
+        android:textStyle="normal|italic"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_comment"
+        android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_toLeftOf="@+id/textViewCommentFeed"
+        android:layout_toStartOf="@+id/textViewCommentFeed"
+        android:id="@+id/imageViewCommentFeed"
+        android:layout_marginRight="4dp"/>
+
+</RelativeLayout>
