@@ -44,6 +44,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.project.markpollution.Objects.Category;
+import com.project.markpollution.Objects.Report;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -327,7 +328,8 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                             // Trigger report on Firebase Database;
                             DatabaseReference refReport = databaseReference.child("Reports");
                             if(!response.equals("insert pollution point failure")){
-                                refReport.setValue(response);
+//                                refReport.setValue(response);
+                                refReport.setValue(new Report(response, getUserID()));
                                 Toast.makeText(SendReportActivity.this, "Insert pollution successful", Toast
                                         .LENGTH_SHORT).show();
                             }

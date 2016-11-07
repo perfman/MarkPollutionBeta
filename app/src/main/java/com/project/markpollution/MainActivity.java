@@ -1,6 +1,7 @@
 package com.project.markpollution;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -54,6 +55,7 @@ import com.project.markpollution.CustomAdapter.PopupInfoWindowAdapter;
 import com.project.markpollution.Interfaces.OnItemClickListener;
 import com.project.markpollution.Objects.Category;
 import com.project.markpollution.Objects.PollutionPoint;
+import com.project.markpollution.Objects.Report;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -240,7 +242,7 @@ public class MainActivity extends AppCompatActivity
         listMarkers.add(marker);
 
         images.put(marker.getId(), Uri.parse(po.getImage()));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 12));
 
     }
 
@@ -349,9 +351,12 @@ public class MainActivity extends AppCompatActivity
         refReport.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(!isFirstTimeLaunch){
-                    tvRefresh.setVisibility(View.VISIBLE);
-                    refreshData();
+                Report obj = dataSnapshot.getValue(Report.class);
+                if(!obj.getId_user().equals(getUserID())){
+                    if(!isFirstTimeLaunch){
+                        tvRefresh.setVisibility(View.VISIBLE);
+                        refreshData();
+                    }
                 }
                 isFirstTimeLaunch = false;
             }
@@ -407,6 +412,11 @@ public class MainActivity extends AppCompatActivity
                 Volley.newRequestQueue(MainActivity.this).add(strReq);
             }
         });
+    }
+
+    private String getUserID(){
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
+        return sharedPreferences.getString("sharedpref_id_user","");
     }
 
     @Override
