@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,14 +39,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.project.markpollution.CustomAdapter.CircleTransform;
 import com.project.markpollution.CustomAdapter.FeedRecyclerViewAdapter;
 import com.project.markpollution.CustomAdapter.PopupInfoWindowAdapter;
+import com.project.markpollution.Interfaces.OnItemClickListener;
 import com.project.markpollution.Objects.Category;
 import com.project.markpollution.Objects.PollutionPoint;
 import com.squareup.picasso.Picasso;
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleMap mMap;
     private Spinner spnCate;
     private ImageView imgGetLocation;
+    private TextView tvRefresh;
     public static ArrayList<PollutionPoint> listPo;
     private List<Category> listCate;
     private List<PollutionPoint> listPoByCateID;
@@ -81,7 +88,11 @@ public class MainActivity extends AppCompatActivity
     private String url_RetrievePollutionByCateID = "http://indi.com.vn/dev/markpollution/RetrievePollutionBy_CateID.php?id_cate=";
     private String url_RetrievePollutionOrderByRate = "http://indi.com.vn/dev/markpollution/RetrievePollutionOrderByRate.php";
     private BottomSheetBehavior bottomSheetBehavior;
+    private FeedRecyclerViewAdapter feedAdapter;
     private RecyclerView recyclerViewFeed;
+    private List<Marker> listMarkers;
+    private boolean isFirstTimeLaunch = true;
+    private ArrayAdapter<Category> cateAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +102,7 @@ public class MainActivity extends AppCompatActivity
         initView();
         setNavigationHeader();
         loadSpinnerCate();
+        listenNewPollution();
     }
 
     private void initView() {
@@ -107,11 +119,14 @@ public class MainActivity extends AppCompatActivity
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         imgGetLocation = (ImageView) findViewById(R.id.imgGetLocation);
         spnCate = (Spinner) findViewById(R.id.spnCateMap);
-        recyclerViewFeed = (RecyclerView) findViewById(R.id.recyclerViewFeed);
+        tvRefresh = (TextView) findViewById(R.id.textViewRefresh);
 
         // initialize bottomSheet
+        recyclerViewFeed = (RecyclerView) findViewById(R.id.recyclerViewFeed);
         View bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerViewFeed.setLayoutManager(layout);
 
         // initialize firebase
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -146,9 +161,6 @@ public class MainActivity extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        // simultaneously listening data changed on Firebase
-//        listenDataChanged();
     }
 
     private void setNavigationHeader() {
@@ -183,11 +195,11 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
-                ArrayAdapter<Category> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout
+                cateAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout
                         .simple_spinner_item,
                         listCate);
-                adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
-                spnCate.setAdapter(adapter);
+                cateAdapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
+                spnCate.setAdapter(cateAdapter);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -213,7 +225,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         filterPollutionByCate(googleMap);
-        loadRecyclerViewFeed();
 
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -225,54 +236,30 @@ public class MainActivity extends AppCompatActivity
                 .title(po.getTitle())
                 .snippet(po.getDesc()));
         marker.setTag(po.getId());
+        // when marker is created. Add it into List<Marker>
+        listMarkers.add(marker);
 
         images.put(marker.getId(), Uri.parse(po.getImage()));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
 
     }
 
-    // Each time filter pollutionPoints by Category. It requests to server => Maybe I'll load data from static List<PollutionPoint>
-    // Get pollution points by cateID and extract into map
-    private void getPollutionByCateID(String CateID) {
-        String completed_RetrievePollutionByCateID = url_RetrievePollutionByCateID + CateID;
-        JsonObjectRequest objReq = new JsonObjectRequest(Request.Method.GET, completed_RetrievePollutionByCateID, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray arr = response.getJSONArray("result");
-                            listPoByCateID = new ArrayList<>();
-                            for (int i = 0; i < arr.length(); i++) {
-                                JSONObject po = arr.getJSONObject(i);
-                                String id_po = po.getString("id_po");
-                                String id_cate = po.getString("id_cate");
-                                String id_user = po.getString("id_user");
-                                double lat = po.getDouble("lat");
-                                double lng = po.getDouble("lng");
-                                String title = po.getString("title");
-                                String desc = po.getString("desc");
-                                String image = po.getString("image");
-                                String time = po.getString("time");
-
-                                listPoByCateID.add(new PollutionPoint(id_po, id_cate, id_user, lat, lng, title, desc, image, time));
-                            }
-                            // extract markers in list<> markers into the map
-                            mMap.clear();
-                            for (PollutionPoint po : listPoByCateID) {
-                                addMarker(mMap, po);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    private void getPollutionByCateID(String CateId){
+        listPoByCateID = new ArrayList<>(); // reinitialize list
+        for(PollutionPoint po: listPo){
+            if (po.getId_cate().equals(CateId)){
+                listPoByCateID.add(po);
             }
-        });
+        }
+        // extract listPoByCateID into map. Don't forget reinitialize list markers
+        listMarkers = new ArrayList<>();
+        mMap.clear();   // clear old map
+        for(PollutionPoint po: listPoByCateID){
+            addMarker(mMap, po);
+        }
 
-        Volley.newRequestQueue(MainActivity.this).add(objReq);
+        // load infoPanel (BottomSheet)
+        loadRecyclerViewFeed(listPoByCateID);
     }
 
     private void filterPollutionByCate(final GoogleMap googleMap){
@@ -287,9 +274,12 @@ public class MainActivity extends AppCompatActivity
                     getPollutionByCateID(CateID);
                 }else{
                     googleMap.clear();
+                    listMarkers = new ArrayList<>();    // each time filter category reinitialize List markers
                     for (PollutionPoint po : listPo) {
                         addMarker(googleMap, po);
                     }
+                    // load bottomSheet
+                    loadRecyclerViewFeed(listPo);
                 }
             }
 
@@ -336,13 +326,87 @@ public class MainActivity extends AppCompatActivity
         Volley.newRequestQueue(this).add(objReq);
     }
 
-    private void loadRecyclerViewFeed(){
-        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerViewFeed.setLayoutManager(layout);
-        recyclerViewFeed.setAdapter(new FeedRecyclerViewAdapter(this, listPo));
-
+    private void loadRecyclerViewFeed(List<PollutionPoint> list){
+        feedAdapter = new FeedRecyclerViewAdapter(this, list);
+        recyclerViewFeed.setAdapter(feedAdapter);
+        feedAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(PollutionPoint po) {
+                for(Marker m: listMarkers){
+                    if(m.getTag().toString().equals(po.getId())){
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(m.getPosition(), 12));
+                        m.showInfoWindow();
+                    }
+                }
+            }
+        });
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setPeekHeight(36);
+    }
+
+    private void listenNewPollution(){
+        DatabaseReference refReport = databaseReference.child("Reports");
+        refReport.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!isFirstTimeLaunch){
+                    tvRefresh.setVisibility(View.VISIBLE);
+                    refreshData();
+                }
+                isFirstTimeLaunch = false;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void refreshData(){
+        tvRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StringRequest strReq = new StringRequest(Request.Method.GET, url_retrive_pollutionPoint, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if(!response.equals("Error when retrieve all pollution points")){
+                            try {
+                                JSONObject json = new JSONObject(response);
+                                JSONArray arr = json.getJSONArray("result");
+                                listPo = new ArrayList<>();     // reinitialize list<Po>
+                                for(int i=0; i<arr.length(); i++){
+                                    JSONObject po = arr.getJSONObject(i);
+                                    String id_po = po.getString("id_po");
+                                    String id_cate = po.getString("id_cate");
+                                    String id_user = po.getString("id_user");
+                                    double lat = po.getDouble("lat");
+                                    double lng = po.getDouble("lng");
+                                    String title = po.getString("title");
+                                    String desc = po.getString("desc");
+                                    String image = po.getString("image");
+                                    String time = po.getString("time");
+
+                                    listPo.add(new PollutionPoint(id_po, id_cate, id_user, lat, lng, title, desc, image, time));
+                                }
+                                spnCate.setAdapter(cateAdapter);    // notifyDataSetChanged for spinnerCate
+                                tvRefresh.setVisibility(View.INVISIBLE);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("Volley", error.getMessage());
+                    }
+                });
+
+                Volley.newRequestQueue(MainActivity.this).add(strReq);
+            }
+        });
     }
 
     @Override
@@ -423,4 +487,8 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("id_po", marker.getTag().toString());
         startActivity(intent);
     }
+
+//    private void testAnimateCamera(){
+//        Button btnTest = (Button) findViewById(R.id.buttonTest);
+//    }
 }

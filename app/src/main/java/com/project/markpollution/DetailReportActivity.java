@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.markpollution.CustomAdapter.CircleTransform;
 import com.project.markpollution.CustomAdapter.CommentRecyclerViewAdapter;
@@ -52,6 +53,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
     private RatingBar ratingBar;
     private TextView tvTitle, tvDesc, tvRate, tvTime, tvEmail, tvCate;
     private EditText etComment;
+    private String title;   // title of marker
     private RecyclerView recyclerViewComment;
     private String url_RetrieveUserById = "http://indi.com.vn/dev/markpollution/RetrieveUserById.php?id_user=";
     private String url_InsertComment = "http://indi.com.vn/dev/markpollution/InsertComment.php";
@@ -104,7 +106,10 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         tvEmail = (TextView) findViewById(R.id.textViewEmailDetail);
         tvCate = (TextView) findViewById(R.id.textViewCategoryDetail);
         etComment = (EditText) findViewById(R.id.editTextComment);
+
         recyclerViewComment = (RecyclerView) findViewById(R.id.recyclerViewComment);
+        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerViewComment.setLayoutManager(layout);
 
         mapFragment.getMapAsync(this);
     }
@@ -115,7 +120,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
 
         String id_user = "";
         String id_cate = "";
-        String title = "";
+        title = "";
         String desc = "";
         String image = "";
         String time = "";
@@ -198,10 +203,10 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                 value = "Plan Pollution";
                 break;
             case 2:
-                value = "Air Pollution";
+                value = "Water Pollution";
                 break;
             case 3:
-                value = "Water Pollution";
+                value = "Air Pollution";
                 break;
             case 4:
                 value = "Thermal Pollution";
@@ -220,9 +225,11 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
         LatLng point = new LatLng(lat, lng);
-        gMap.addMarker(new MarkerOptions().position(point));
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
-        gMap.getUiSettings().setMapToolbarEnabled(false);
+        Marker marker = googleMap.addMarker(new MarkerOptions().position(point).title(title));
+        marker.showInfoWindow();
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
     private void sendComment() {
@@ -235,6 +242,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                         public void onResponse(String response) {
                             Toast.makeText(DetailReportActivity.this, response, Toast.LENGTH_SHORT).show();
                             etComment.setText(null);
+                            retrieveComments();
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -272,11 +280,12 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                 try {
                     if(response.getString("status").equals("success")){
                         JSONArray arr = response.getJSONArray("response");
+                        listComment = new ArrayList<>();    // reinitialize list<Comment> when retrieve comments
                         for(int i=0; i<arr.length(); i++){
                             JSONObject comment = arr.getJSONObject(i);
                             listComment.add(new Comment(comment.getString("id_po"), comment.getString("id_user"), comment.getString("comment"), comment.getString("time")));
-                            loadComments();
                         }
+                        loadComments();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -293,8 +302,6 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void loadComments(){
-        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerViewComment.setLayoutManager(layout);
         recyclerViewComment.setAdapter(new CommentRecyclerViewAdapter(this, listComment));
     }
 

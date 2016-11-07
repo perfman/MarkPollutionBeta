@@ -4,21 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
-
-    <TextView
-        android:text="This is the title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageViewAvatarFeed"
-        android:layout_toEndOf="@+id/imageViewAvatarFeed"
-        android:layout_marginLeft="23dp"
-        android:layout_marginStart="23dp"
-        android:id="@+id/textViewTitleFeed"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textStyle="normal|bold"
-        android:textColor="@color/cast_intro_overlay_background_color"/>
+    android:padding="8dp"
+    android:id="@+id/container_feed">
 
     <TextView
         android:text="hh:mm:ss dd/MM/yyyy"
@@ -33,41 +20,55 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/sym_def_app_icon"
-        android:id="@+id/imageViewAvatarFeed"
+        android:id="@+id/imageViewCateFeed"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
 
     <TextView
+        android:text="This is the title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewTitleFeed"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="normal|bold"
+        android:textColor="@color/cast_intro_overlay_background_color"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageViewCateFeed"
+        android:layout_toEndOf="@+id/imageViewCateFeed"
+        android:layout_marginLeft="4dp"/>
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:srcCompat="@android:drawable/sym_def_app_icon"
+        android:id="@+id/imageViewPictureFeed"
+        android:layout_below="@+id/imageViewCateFeed"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+    <TextView
         android:text="This is the description This is the description This is the description This is the description This is the description This is the description This is the description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageViewAvatarFeed"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="13dp"
         android:lines="3"
-        android:id="@+id/textViewDescFeed"/>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/sym_def_app_icon"
-        android:layout_below="@+id/textViewDescFeed"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/imageViewPictureFeed"
-        android:layout_marginTop="8dp"/>
+        android:id="@+id/textViewDescFeed"
+        android:layout_toLeftOf="@+id/imageViewPictureFeed"
+        android:layout_toStartOf="@+id/imageViewPictureFeed"
+        android:layout_below="@+id/textViewTimeFeed"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"/>
 
     <TextView
         android:text="999"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageViewPictureFeed"
+        android:id="@+id/textViewRateFeed"
+        android:textStyle="normal|italic"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="11dp"
-        android:id="@+id/textViewRateFeed"
-        android:textStyle="normal|italic"/>
+        android:layout_below="@+id/imageViewPictureFeed"
+        android:layout_marginTop="4dp"/>
 
     <ImageView
         android:layout_width="wrap_content"

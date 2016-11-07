@@ -41,5 +41,21 @@
                 android:layout_marginBottom="33sp"
                 android:src="@drawable/add_marker" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewRefresh"
+                android:text="New pollution point(s) have reported! \nClick here to reload..."
+                android:textColor="#ffffff"
+                android:background="#0d16ba"
+                android:layout_marginTop="16dp"
+                android:textAlignment="center"
+                android:visibility="invisible"/>
+        </LinearLayout>
     </FrameLayout>
 </RelativeLayout>

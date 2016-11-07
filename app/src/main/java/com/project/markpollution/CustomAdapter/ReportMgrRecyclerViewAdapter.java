@@ -138,6 +138,9 @@ public class ReportMgrRecyclerViewAdapter extends RecyclerView.Adapter<ReportMgr
                 Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                if(response.isEmpty()){
+                    tvHolder.setText("0");
+                }
                 tvHolder.setText(response);
             }
         }, new Response.ErrorListener() {
