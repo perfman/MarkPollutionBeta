@@ -24,8 +24,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SlidingDrawer;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +41,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity
     private Spinner spnCate;
     private ImageView imgGetLocation;
     private TextView tvRefresh;
+    private SlidingDrawer simpleSlidingDrawer;
     public static ArrayList<PollutionPoint> listPo;
     private List<Category> listCate;
     private List<PollutionPoint> listPoByCateID;
@@ -123,10 +124,22 @@ public class MainActivity extends AppCompatActivity
         spnCate = (Spinner) findViewById(R.id.spnCateMap);
         tvRefresh = (TextView) findViewById(R.id.textViewRefresh);
 
-        // initialize bottomSheet
+        // initiate the SlidingDrawer
+        simpleSlidingDrawer = (SlidingDrawer) findViewById(R.id.simpleSlidingDrawer);
+        final ImageButton handleButton = (ImageButton) findViewById(R.id.handle);
+        simpleSlidingDrawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
+            @Override
+            public void onDrawerOpened() {
+                handleButton.setImageResource(R.drawable.ic_expand_00000);
+            }
+        });
+        simpleSlidingDrawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
+            @Override
+            public void onDrawerClosed() {
+                handleButton.setImageResource(R.drawable.ic_expand_00010);
+            }
+        });
         recyclerViewFeed = (RecyclerView) findViewById(R.id.recyclerViewFeed);
-        View bottomSheet = findViewById(R.id.bottom_sheet);
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerViewFeed.setLayoutManager(layout);
 
@@ -177,7 +190,7 @@ public class MainActivity extends AppCompatActivity
         String avatar = intent.getStringExtra("avatar");
         tvNavName.setText(name);
         tvNavEmail.setText(email);
-        Picasso.with(this).load(Uri.parse(avatar)).resize(250, 250).transform(new CircleTransform()).into(ivNavAvatar);
+        Picasso.with(this).load(Uri.parse(avatar)).resize(170,170).transform(new CircleTransform()).into(ivNavAvatar);
     }
 
     private void loadSpinnerCate() {
@@ -260,8 +273,8 @@ public class MainActivity extends AppCompatActivity
             addMarker(mMap, po);
         }
 
-        // load infoPanel (BottomSheet)
-        loadRecyclerViewFeed(listPoByCateID);
+        // load infoPanel (SlidingDrawer)
+        loadSlidingDrawerFeed(listPoByCateID);
     }
 
     private void filterPollutionByCate(final GoogleMap googleMap){
@@ -280,8 +293,8 @@ public class MainActivity extends AppCompatActivity
                     for (PollutionPoint po : listPo) {
                         addMarker(googleMap, po);
                     }
-                    // load bottomSheet
-                    loadRecyclerViewFeed(listPo);
+                    // load slidingDrawer
+                    loadSlidingDrawerFeed(listPo);
                 }
             }
 
@@ -328,7 +341,9 @@ public class MainActivity extends AppCompatActivity
         Volley.newRequestQueue(this).add(objReq);
     }
 
-    private void loadRecyclerViewFeed(List<PollutionPoint> list){
+    private void loadSlidingDrawerFeed(List<PollutionPoint> list){
+        simpleSlidingDrawer.open();
+
         feedAdapter = new FeedRecyclerViewAdapter(this, list);
         recyclerViewFeed.setAdapter(feedAdapter);
         feedAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -338,16 +353,15 @@ public class MainActivity extends AppCompatActivity
                     if(m.getTag().toString().equals(po.getId())){
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(m.getPosition(), 12));
                         m.showInfoWindow();
+                        break;
                     }
                 }
             }
         });
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        bottomSheetBehavior.setPeekHeight(36);
     }
 
     private void listenNewPollution(){
-        DatabaseReference refReport = databaseReference.child("Reports");
+        DatabaseReference refReport = databaseReference.child("NewReports");
         refReport.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

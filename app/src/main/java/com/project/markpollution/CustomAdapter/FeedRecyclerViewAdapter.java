@@ -2,22 +2,14 @@ package com.project.markpollution.CustomAdapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.project.markpollution.Interfaces.OnItemClickListener;
 import com.project.markpollution.Objects.PollutionPoint;
 import com.project.markpollution.R;
@@ -35,8 +27,8 @@ import java.util.List;
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.FeedRecyclerViewHolder> {
     private Context context;
     private List<PollutionPoint> listPo;
-    private String url_CountCommentByPo = "http://indi.com.vn/dev/markpollution/CountCommentByPo.php?id_po=";
-    private String url_SumRateByPo = "http://indi.com.vn/dev/markpollution/SumRateByPo.php?id_po=";
+//    private String url_CountCommentByPo = "http://indi.com.vn/dev/markpollution/CountCommentByPo.php?id_po=";
+//    private String url_SumRateByPo = "http://indi.com.vn/dev/markpollution/SumRateByPo.php?id_po=";
     private OnItemClickListener onItemClickListener;
 
     public FeedRecyclerViewAdapter(Context context, List<PollutionPoint> listPo) {
@@ -46,7 +38,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public FeedRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_recyclerview_feed, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_recyclerview_feed2, parent, false);
         return new FeedRecyclerViewHolder(view);
     }
 
@@ -58,8 +50,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         holder.tvTime.setText(formatDateTime(curPo.getTime()));
         holder.tvDesc.setText(curPo.getDesc());
         Picasso.with(context).load(Uri.parse(curPo.getImage())).placeholder(R.drawable.placeholder).into(holder.ivPicture);
-        setCountCommentByPo(curPo.getId(), holder.tvComment);
-        setSumRateByPo(curPo.getId(), holder.tvRate);
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -67,7 +57,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 onItemClickListener.onItemClick(curPo);
             }
         };
-
         holder.container.setOnClickListener(clickListener);
     }
 
@@ -78,19 +67,17 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     class FeedRecyclerViewHolder extends RecyclerView.ViewHolder{
         ImageView ivCate, ivPicture;
-        TextView tvTitle, tvTime, tvDesc, tvComment, tvRate;
-        RelativeLayout container;
+        TextView tvTitle, tvTime, tvDesc;
+        CardView container;
 
         public FeedRecyclerViewHolder(View itemView) {
             super(itemView);
-            ivCate = (ImageView) itemView.findViewById(R.id.imageViewCateFeed);
-            ivPicture = (ImageView) itemView.findViewById(R.id.imageViewPictureFeed);
-            tvTitle = (TextView) itemView.findViewById(R.id.textViewTitleFeed);
-            tvTime = (TextView) itemView.findViewById(R.id.textViewTimeFeed);
-            tvDesc = (TextView) itemView.findViewById(R.id.textViewDescFeed);
-            tvComment = (TextView) itemView.findViewById(R.id.textViewCommentFeed);
-            tvRate = (TextView) itemView.findViewById(R.id.textViewRateFeed);
-            container = (RelativeLayout) itemView.findViewById(R.id.container_feed);
+            ivCate = (ImageView) itemView.findViewById(R.id.ivCateFeed);
+            ivPicture = (ImageView) itemView.findViewById(R.id.ivPictureFeed);
+            tvTitle = (TextView) itemView.findViewById(R.id.tvTitleFeed);
+            tvTime = (TextView) itemView.findViewById(R.id.tvTimeFeed);
+            tvDesc = (TextView) itemView.findViewById(R.id.tvDescFeed);
+            container = (CardView) itemView.findViewById(R.id.card_view_feed);
         }
     }
 
@@ -108,61 +95,61 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         return resultFormat.format(datetime);
     }
 
-    private void setCountCommentByPo(String id_po, final TextView ivHolder){
-        StringRequest strReq = new StringRequest(Request.Method.GET, url_CountCommentByPo +
-                id_po, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if(!response.equals("Count comment failure")){
-                    ivHolder.setText(response);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//    private void setCountCommentByPo(String id_po, final TextView ivHolder){
+//        StringRequest strReq = new StringRequest(Request.Method.GET, url_CountCommentByPo +
+//                id_po, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                if(!response.equals("Count comment failure")){
+//                    ivHolder.setText(response);
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        Volley.newRequestQueue(context).add(strReq);
+//    }
 
-        Volley.newRequestQueue(context).add(strReq);
-    }
-
-    private void setSumRateByPo(String id_po, final TextView tvHolder){
-        StringRequest strReq = new StringRequest(Request.Method.GET, url_SumRateByPo + id_po , new
-                Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        tvHolder.setText(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Volley.newRequestQueue(context).add(strReq);
-    }
+//    private void setSumRateByPo(String id_po, final TextView tvHolder){
+//        StringRequest strReq = new StringRequest(Request.Method.GET, url_SumRateByPo + id_po , new
+//                Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        tvHolder.setText(response);
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        Volley.newRequestQueue(context).add(strReq);
+//    }
 
     private void setCateIcon(String cateID, ImageView holder){
         switch (cateID){
             case "1":
-                holder.setImageResource(R.drawable.land_pollution);
+                holder.setImageResource(R.drawable.land_icon);
                 break;
             case "2":
-                holder.setImageResource(R.drawable.water_pollution);
+                holder.setImageResource(R.drawable.water);
                 break;
             case "3":
-                holder.setImageResource(R.drawable.air_pollution);
+                holder.setImageResource(R.drawable.air_icon);
                 break;
             case "4":
-                holder.setImageResource(R.drawable.thermal_pollution);
+                holder.setImageResource(R.drawable.thermal_icon);
                 break;
             case "5":
-                holder.setImageResource(R.drawable.light_pollution);
+                holder.setImageResource(R.drawable.light_icon);
                 break;
             case "6":
-                holder.setImageResource(R.drawable.noise_pollution);
+                holder.setImageResource(R.drawable.noise_icon);
                 break;
         }
     }

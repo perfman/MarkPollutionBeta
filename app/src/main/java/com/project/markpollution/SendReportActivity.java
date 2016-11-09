@@ -326,7 +326,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                         @Override
                         public void onResponse(String response) {
                             // Trigger report on Firebase Database;
-                            DatabaseReference refReport = databaseReference.child("Reports");
+                            DatabaseReference refReport = databaseReference.child("NewReports");
                             if(!response.equals("insert pollution point failure")){
 //                                refReport.setValue(response);
                                 refReport.setValue(new Report(response, getUserID()));

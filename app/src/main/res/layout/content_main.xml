@@ -58,4 +58,36 @@
                 android:visibility="invisible"/>
         </LinearLayout>
     </FrameLayout>
+
+    <SlidingDrawer
+        android:id="@+id/simpleSlidingDrawer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:content="@+id/content"
+        android:handle="@+id/handle"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:rotation="360">
+        <!--what is rotation?-->
+        <ImageButton
+            android:id="@id/handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_expand_00010"
+            android:rotation="270"
+            android:text="Open"
+            android:textColor="#fff" />
+        <LinearLayout
+            android:id="@id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:rotation="360">
+            <!--why horizontal-->
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/recyclerViewFeed"/>
+        </LinearLayout>
+    </SlidingDrawer>
 </RelativeLayout>

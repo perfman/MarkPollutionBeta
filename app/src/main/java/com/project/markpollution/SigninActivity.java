@@ -100,7 +100,7 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("Volley", error.getMessage());
+//                        Log.e("Volley", error.getMessage());
                     }
                 });
 
