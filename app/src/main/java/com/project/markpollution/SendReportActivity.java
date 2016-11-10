@@ -108,7 +108,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Get intent from MapFragment
+        // Get intent from MainActivity
         Intent i = getIntent();
         lat = i.getDoubleExtra("Lat", 0);
         lng = i.getDoubleExtra("Long", 0);
@@ -118,8 +118,8 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                 .title("This is Pollution Point "))
                 .showInfoWindow();
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 17));
-        googleMap.getUiSettings().setAllGesturesEnabled(false);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 12));
+        googleMap.getUiSettings().setAllGesturesEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
@@ -328,11 +328,12 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                             // Trigger report on Firebase Database;
                             DatabaseReference refReport = databaseReference.child("NewReports");
                             if(!response.equals("insert pollution point failure")){
-//                                refReport.setValue(response);
                                 refReport.setValue(new Report(response, getUserID()));
                                 Toast.makeText(SendReportActivity.this, "Insert pollution successful", Toast
                                         .LENGTH_SHORT).show();
                             }
+                            // return MainActivity and trigger Refresh data
+                            MainActivity.triggerRefreshData = true;
                             finish();
                         }
                     }, new Response.ErrorListener() {
