@@ -58,11 +58,11 @@
                 android:visibility="invisible"/>
         </LinearLayout>
 
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/btnTest"-->
-            <!--android:text="Test"/>-->
+      <!--  <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnTest"
+            android:text="Test"/>-->
     </FrameLayout>
 
     <SlidingDrawer

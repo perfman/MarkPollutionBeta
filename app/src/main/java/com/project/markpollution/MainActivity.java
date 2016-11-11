@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SlidingDrawer;
@@ -55,6 +57,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -103,6 +107,7 @@ public class MainActivity extends AppCompatActivity
     private List<PollutionPoint> listPoByCateID;
     private List<PollutionPoint> listSeriousPo;
     private List<PollutionPoint> listRecentPo;
+    private List<PollutionPoint> listNearbyPo;
     private HashMap<String, Uri> images = new HashMap<>();
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -122,7 +127,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
     private final static int REQUEST_CHECK_SETTINGS = 9;
-    private Location currenLocation;
+    private Location curLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -363,6 +368,9 @@ public class MainActivity extends AppCompatActivity
                                 for (PollutionPoint po : listSeriousPo) {
                                     addMarker(mMap, po);
                                 }
+                                // update camera
+                                cameraViewAllMarkers(listMarkers);
+
                                 // load infoPanel
                                 loadSlidingDrawerFeed(listSeriousPo);
                             }
@@ -402,6 +410,10 @@ public class MainActivity extends AppCompatActivity
                                 for (PollutionPoint po : listRecentPo) {
                                     addMarker(mMap, po);
                                 }
+
+                                // update camera
+                                cameraViewAllMarkers(listMarkers);
+
                                 // load infoPanel
                                 loadSlidingDrawerFeed(listRecentPo);
                             }
@@ -419,19 +431,46 @@ public class MainActivity extends AppCompatActivity
         Volley.newRequestQueue(MainActivity.this).add(objReq);
     }
 
-//    private void loadNearByPollution() {
-//        mMap.clear();
-//        listMarkers = new ArrayList<>();
-//
-//        for (PollutionPoint po : listPo) {
-//            LatLng latLng = new LatLng(po.getLat(), po.getLng());
-//            double distance = SphericalUtil.computeDistanceBetween(latLong_my_location, latLng);
-//            // chỉnh khoảng cách trong cài đặt
-//            if (distance <= 5000) {
-//                addMarker(mMap, po);
-//            }
-//        }
-//    }
+    private void getNearByPollution() {
+        // getNearbyPollution
+        listNearbyPo = new ArrayList<>();
+        for (PollutionPoint po : listPo) {
+            LatLng latLng = new LatLng(po.getLat(), po.getLng());
+            double distance = SphericalUtil.computeDistanceBetween(new LatLng(curLocation.getLatitude(),
+                    curLocation.getLongitude()),
+                    latLng);
+            if (distance <= 1000) {
+                listNearbyPo.add(po);
+            }
+        }
+
+        // add NearbyPo markers into map
+        listMarkers = new ArrayList<>();
+        mMap.clear();
+        for(PollutionPoint po: listNearbyPo){
+            addMarker(mMap, po);
+        }
+
+        // Draw circle around my location
+        mMap.addCircle(new CircleOptions()
+                .center(new LatLng(curLocation.getLatitude(), curLocation.getLongitude()))
+                .radius(5000)
+                .strokeWidth(2)
+                .strokeColor(Color.RED)
+                .fillColor(Color.argb(128, 255, 0, 0)));
+
+        // update camera
+        LatLng southwest = SphericalUtil.computeOffset(new LatLng(curLocation.getLatitude(), curLocation.getLongitude
+                ()), 5000 * Math.sqrt(2.0), 225);
+        LatLng northeast = SphericalUtil.computeOffset(new LatLng(curLocation.getLatitude(), curLocation.getLongitude
+                ()), 5000 * Math.sqrt(2.0), 45);
+        LatLngBounds latLngBounds = new LatLngBounds(southwest, northeast);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 30));
+
+
+        // load infoPanel (SlidingDrawer)
+        loadSlidingDrawerFeed(listNearbyPo);
+    }
 
     private void loadSlidingDrawerFeed(List<PollutionPoint> list) {
         simpleSlidingDrawer.open();
@@ -630,7 +669,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_reportMgr) {
             startActivity(new Intent(this, ReportManagementActivity.class));
         } else if (id == R.id.nav_nearbyPo) {
-
+            getNearByPollution();
         } else if (id == R.id.nav_seriousPo) {
             getSeriousPollution();
         } else if (id == R.id.nav_share) {
@@ -665,36 +704,6 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, DetailReportActivity.class);
         intent.putExtra("id_po", marker.getTag().toString());
         startActivity(intent);
-    }
-
-    // Whenever comeback this Activity. RefreshData
-    @Override
-    protected void onResume() {
-        super.onResume();
-        fetchDataFromServer();
-
-        // Within {@code onPause()}, we pause location updates, but leave the
-        // connection to GoogleApiClient intact.  Here, we resume receiving
-        // location updates if the user has requested them.
-        if (mGoogleApiClient.isConnected()) {
-            startLocationUpdates();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
-        if (mGoogleApiClient.isConnected()) {
-            stopLocationUpdates();
-        }
-    }
-
-    // Disconnect googleApiClient when activity stopped
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mGoogleApiClient.disconnect();
     }
 
     private void configCheckLocation() {
@@ -755,7 +764,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         // get Current Location
-        if (currenLocation == null) {
+        if (curLocation == null) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -766,7 +775,7 @@ public class MainActivity extends AppCompatActivity
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            currenLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            curLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         }
     }
 
@@ -782,7 +791,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        currenLocation = location;
+        curLocation = location;
     }
 
     // Handle ResolutionRequired
@@ -824,5 +833,35 @@ public class MainActivity extends AppCompatActivity
                 mGoogleApiClient,
                 this
         );
+    }
+
+    // Whenever comeback this Activity. RefreshData
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchDataFromServer();
+
+        // Within {@code onPause()}, we pause location updates, but leave the
+        // connection to GoogleApiClient intact.  Here, we resume receiving
+        // location updates if the user has requested them.
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+        }
+    }
+
+    // Disconnect googleApiClient when activity stopped
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
     }
 }
