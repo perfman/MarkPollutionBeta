@@ -28,7 +28,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SlidingDrawer;
@@ -57,7 +56,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity
     private List<PollutionPoint> listSeriousPo;
     private List<PollutionPoint> listRecentPo;
     private List<PollutionPoint> listNearbyPo;
-    private HashMap<String, Uri> images = new HashMap<>();
+    private HashMap<String, PollutionPoint> hasmapMarkers = new HashMap<>();
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private String url_retrive_pollutionPoint = "http://indi.com.vn/dev/markpollution/RetrievePollutionPoint.php";
@@ -264,7 +263,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        googleMap.setInfoWindowAdapter(new PopupInfoWindowAdapter(this, LayoutInflater.from(this), images));
+        googleMap.setInfoWindowAdapter(new PopupInfoWindowAdapter(this, LayoutInflater.from(this), hasmapMarkers));
         googleMap.setOnInfoWindowClickListener(this);
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -285,6 +284,8 @@ public class MainActivity extends AppCompatActivity
 
     private void addMarker(GoogleMap map, PollutionPoint po) {
         Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(po.getLat(), po.getLng()))
+                .icon(BitmapDescriptorFactory.fromResource(setIconMarker(po.getId_cate())))
+                .anchor(0.5f, 0.85f)
                 .title(po.getTitle())
                 .snippet(po.getDesc()));
         marker.setTag(po.getId());
@@ -292,7 +293,35 @@ public class MainActivity extends AppCompatActivity
         // when marker is created. Add it into List<Marker>
         listMarkers.add(marker);
         // when marker is created. Add it into HashMap to custom InfoWindow
-        images.put(marker.getId(), Uri.parse(po.getImage()));
+        hasmapMarkers.put(marker.getId(), po);
+    }
+
+    private int setIconMarker(String id){
+        int idIcon = 0;
+        switch (id){
+            case "1":
+                idIcon = R.drawable.marker_land_icon;
+                break;
+            case "2" :
+                idIcon = R.drawable.marker_watter_icon;
+                break;
+            case "3":
+                idIcon = R.drawable.marker_air_icon;
+                break;
+            case "4" :
+                idIcon = R.drawable.marker_thermal_icon;
+                break;
+            case "5":
+                idIcon = R.drawable.marker_light_icon;
+                break;
+            case "6" :
+                idIcon = R.drawable.marker_noise_icon;
+                break;
+            default:
+                break;
+
+        }
+        return idIcon;
     }
 
     private void getPollutionByCateID(String CateId) {
@@ -457,14 +486,14 @@ public class MainActivity extends AppCompatActivity
                 .radius(5000)
                 .strokeWidth(2)
                 .strokeColor(Color.RED)
-                .fillColor(Color.argb(128, 255, 0, 0)));
+                .fillColor(R.color.fill_circle));
 
         // update camera
-        LatLng southwest = SphericalUtil.computeOffset(new LatLng(curLocation.getLatitude(), curLocation.getLongitude
+        LatLng bottomLeft = SphericalUtil.computeOffset(new LatLng(curLocation.getLatitude(), curLocation.getLongitude
                 ()), 5000 * Math.sqrt(2.0), 225);
-        LatLng northeast = SphericalUtil.computeOffset(new LatLng(curLocation.getLatitude(), curLocation.getLongitude
+        LatLng topRight = SphericalUtil.computeOffset(new LatLng(curLocation.getLatitude(), curLocation.getLongitude
                 ()), 5000 * Math.sqrt(2.0), 45);
-        LatLngBounds latLngBounds = new LatLngBounds(southwest, northeast);
+        LatLngBounds latLngBounds = new LatLngBounds(bottomLeft, topRight);
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 30));
 
 
@@ -484,6 +513,7 @@ public class MainActivity extends AppCompatActivity
                     if (m.getTag().toString().equals(po.getId())) {
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(m.getPosition(), 12));
                         m.showInfoWindow();
+                        simpleSlidingDrawer.close();    // close slidingDrawer when focus one marker
                         break;
                     }
                 }

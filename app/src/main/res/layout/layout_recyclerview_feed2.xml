@@ -31,8 +31,8 @@
 
             <ImageView
                 android:id="@+id/ivCateFeed"
-                android:layout_width="@dimen/feed_item_profile_pic"
-                android:layout_height="@dimen/feed_item_profile_pic"
+                android:layout_width="@dimen/feed_item_cate_pic"
+                android:layout_height="@dimen/feed_item_cate_pic"
                 android:src="@drawable/placeholder"
                 android:scaleType="fitCenter" />
 

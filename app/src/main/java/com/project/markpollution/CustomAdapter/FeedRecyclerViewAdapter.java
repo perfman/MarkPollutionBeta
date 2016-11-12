@@ -27,8 +27,6 @@ import java.util.List;
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.FeedRecyclerViewHolder> {
     private Context context;
     private List<PollutionPoint> listPo;
-//    private String url_CountCommentByPo = "http://indi.com.vn/dev/markpollution/CountCommentByPo.php?id_po=";
-//    private String url_SumRateByPo = "http://indi.com.vn/dev/markpollution/SumRateByPo.php?id_po=";
     private OnItemClickListener onItemClickListener;
 
     public FeedRecyclerViewAdapter(Context context, List<PollutionPoint> listPo) {
@@ -38,7 +36,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
     @Override
     public FeedRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_recyclerview_feed2, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_recyclerview_feed, parent, false);
         return new FeedRecyclerViewHolder(view);
     }
 
@@ -49,7 +47,9 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         holder.tvTitle.setText(curPo.getTitle());
         holder.tvTime.setText(formatDateTime(curPo.getTime()));
         holder.tvDesc.setText(curPo.getDesc());
-        Picasso.with(context).load(Uri.parse(curPo.getImage())).placeholder(R.drawable.placeholder).into(holder.ivPicture);
+        Picasso.with(context).load(Uri.parse(curPo.getImage())).placeholder(R.drawable.placeholder)
+                .resize(200, 200).centerCrop()
+                .into(holder.ivPicture);
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -94,42 +94,6 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
 
         return resultFormat.format(datetime);
     }
-
-//    private void setCountCommentByPo(String id_po, final TextView ivHolder){
-//        StringRequest strReq = new StringRequest(Request.Method.GET, url_CountCommentByPo +
-//                id_po, new Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String response) {
-//                if(!response.equals("Count comment failure")){
-//                    ivHolder.setText(response);
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        Volley.newRequestQueue(context).add(strReq);
-//    }
-
-//    private void setSumRateByPo(String id_po, final TextView tvHolder){
-//        StringRequest strReq = new StringRequest(Request.Method.GET, url_SumRateByPo + id_po , new
-//                Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        tvHolder.setText(response);
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        Volley.newRequestQueue(context).add(strReq);
-//    }
 
     private void setCateIcon(String cateID, ImageView holder){
         switch (cateID){

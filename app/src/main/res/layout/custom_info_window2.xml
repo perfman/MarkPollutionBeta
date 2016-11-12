@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/ivPicture_InfoWindow"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@mipmap/ic_launcher" />
+    <TextView
+        android:id="@+id/tvTime_InfoWindow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="timetimetimetime"
+        android:layout_marginTop="2dp"
+        android:layout_below="@+id/ivPicture_InfoWindow"
+        android:layout_toRightOf="@+id/ivIconTime_InfoWindow"
+        android:textColor="@color/timestamp"
+        android:textSize="@dimen/feed_item_timestamp"/>
+    <ImageView
+        android:id="@+id/ivIconTime_InfoWindow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_time"
+        android:layout_below="@+id/ivPicture_InfoWindow"
+        android:layout_margin="2dp"/>
+
+    <TextView
+        android:id="@+id/tvTitle_InfoWindow"
+        android:layout_width="200dp"
+        android:textColor="@color/colorPrimary"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/ivPicture_InfoWindow"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:text="TitleTitleTitleTitleTitleTitle"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvDesc_InfoWindow"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/tvTitle_InfoWindow"
+        android:layout_toRightOf="@+id/ivPicture_InfoWindow"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:paddingTop="2dp"
+        android:paddingLeft="5dp"
+        android:text="Description DescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescriptionDescription"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:id="@+id/tvRate_InfoWindow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvDesc_InfoWindow"
+        android:layout_toEndOf="@id/tvDesc_InfoWindow"
+        android:padding="2dp"
+        android:textSize="13sp"
+        android:layout_toRightOf="@id/tvDesc_InfoWindow"/>
+
+    <TextView
+        android:id="@+id/tvComment_InfoWindow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvDesc_InfoWindow"
+        android:layout_toLeftOf="@+id/imgRate"
+        android:padding="2dp"
+        android:textSize="13sp"/>
+
+    <ImageView
+        android:id="@+id/imgCmt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvDesc_InfoWindow"
+        android:layout_toLeftOf="@+id/tvComment_InfoWindow"
+        android:src="@drawable/ic_comment_grey" />
+
+    <ImageView
+        android:id="@+id/imgRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_rate_grey"
+        android:layout_below="@+id/tvDesc_InfoWindow"
+        android:layout_toLeftOf="@+id/tvRate_InfoWindow"
+        android:layout_toStartOf="@+id/tvRate_InfoWindow"
+        android:layout_marginLeft="8dp"/>
+</RelativeLayout>
