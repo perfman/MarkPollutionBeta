@@ -101,7 +101,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
                 holder.setImageResource(R.drawable.land_icon);
                 break;
             case "2":
-                holder.setImageResource(R.drawable.water);
+                holder.setImageResource(R.drawable.water_icon);
                 break;
             case "3":
                 holder.setImageResource(R.drawable.air_icon);

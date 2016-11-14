@@ -1,19 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:background="#FFFFFF"
+                android:layout_height="fill_parent" >
 
+    <ImageView
+        android:id="@+id/image1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/capture_icon"
+        />
     <TextView
-        android:text="Capture"
-        android:layout_width="match_parent"
+        android:id="@+id/btnCapture"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewCapture"
-        android:textStyle="normal|bold" />
+        android:text="@string/button_capture"
+        android:layout_toRightOf="@+id/image1"
+        android:gravity="start|center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/image2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/gallery_icon"
+        android:id="@+id/image2"
+        android:layout_below="@+id/image1"/>
+    <TextView
+        android:id="@+id/btnGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start|center"
+        android:text="@string/button_choosefromgallery"
+        android:layout_toRightOf="@+id/image2"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_below="@+id/image1"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/image2" />
 
-    <TextView
-        android:text="Choose from Gallery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textViewGallery"
-        android:textStyle="normal|bold"/>
-</LinearLayout>
+</RelativeLayout>

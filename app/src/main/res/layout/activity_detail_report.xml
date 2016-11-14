@@ -21,7 +21,6 @@
             android:layout_height="120dp"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             maps:mapType="normal"
-            maps:liteMode="true"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true" />
 
@@ -86,6 +85,27 @@
             android:id="@+id/imageViewAvatarDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_has_resolved_admin"
+            android:id="@+id/imageViewResolved_Admin"
+            android:layout_below="@+id/textViewEmailDetail"
+            android:layout_toLeftOf="@+id/imageViewDelete_Admin"
+            android:layout_toStartOf="@+id/imageViewDelete_Admin"
+            android:layout_marginRight="4dp"
+            android:visibility="invisible"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_delete"
+            android:id="@+id/imageViewDelete_Admin"
+            android:layout_below="@+id/textViewEmailDetail"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="4dp"
+            android:visibility="invisible"/>
 
         <ImageView
             android:layout_width="wrap_content"

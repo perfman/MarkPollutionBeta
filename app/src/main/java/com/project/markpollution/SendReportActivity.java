@@ -132,8 +132,8 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                 dialog.setTitle("Select option:");
                 dialog.show();
 
-                TextView tvCapture = (TextView) dialog.findViewById(R.id.textViewCapture);
-                TextView tvGallery = (TextView) dialog.findViewById(R.id.textViewGallery);
+                TextView tvCapture = (TextView) dialog.findViewById(R.id.btnCapture);
+                TextView tvGallery = (TextView) dialog.findViewById(R.id.btnGallery);
                 tvCapture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
