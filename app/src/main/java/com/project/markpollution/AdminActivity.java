@@ -77,7 +77,6 @@ public class AdminActivity extends AppCompatActivity {
                                 intent.putExtra("id_po", po.getId());
                                 intent.putExtra("admin", true);
                                 startActivity(intent);
-                                finish();
                             }
                         });
                     }
@@ -93,5 +92,11 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         Volley.newRequestQueue(this).add(objReq);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadAdminPortalData();
     }
 }

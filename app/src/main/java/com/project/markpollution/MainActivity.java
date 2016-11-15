@@ -530,8 +530,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         refNewReport.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Report obj = dataSnapshot.getValue(Report.class);
-                if (!obj.getId_user().equals(getUserID())) {
+                Report report = dataSnapshot.getValue(Report.class);
+                if (!report.getId_user().equals(getUserID())) {
                     if (!isFirstTimeLaunch) {
                         tvRefresh.setVisibility(View.VISIBLE);
                         refreshData();
@@ -632,6 +632,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     listPo.add(new PollutionPoint(id_po, id_cate, id_user, lat, lng, title, desc, image, time));
                                 }
                                 spnCate.setAdapter(cateAdapter);    // notifyDataSetChanged for spinnerCate
+                                // show RecentPollution
+                                getRecentPollution();
+
                                 tvRefresh.setVisibility(View.INVISIBLE);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -768,6 +771,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(this, AdminActivity.class));
         } else if (id == R.id.nav_logout) {
             logout();
+        } else if(id == R.id.nav_setting){
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

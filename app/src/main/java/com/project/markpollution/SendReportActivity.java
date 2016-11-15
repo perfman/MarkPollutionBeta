@@ -1,6 +1,7 @@
 package com.project.markpollution;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -74,6 +75,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
     private String id_cate;     // to store id's category on selected item (In spinner)
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,7 +91,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
         databaseReference = firebaseDatabase.getReference();
         initView();
         captureOrGetFromGallery();
-        loadSpinner();
+        loadSpinnerCate();
         getCateID();
 
     }
@@ -119,7 +121,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                 .showInfoWindow();
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 12));
-        googleMap.getUiSettings().setAllGesturesEnabled(true);
+//        googleMap.getUiSettings().setAllGesturesEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
@@ -129,7 +131,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
             public void onClick(View v) {
                 final Dialog dialog = new Dialog(SendReportActivity.this);
                 dialog.setContentView(R.layout.custom_dialog_choose_media);
-                dialog.setTitle("Select option:");
+//                dialog.setTitle("Select option:");
                 dialog.show();
 
                 TextView tvCapture = (TextView) dialog.findViewById(R.id.btnCapture);
@@ -250,7 +252,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
         return sharedPreferences.getString("sharedpref_id_user","");
     }
 
-    private void loadSpinner(){
+    private void loadSpinnerCate(){
         StringRequest stringReq = new StringRequest(Request.Method.GET, url_retrieve_cate, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -298,6 +300,8 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onClick(View v) {
         if(v == btnSubmit){
+            showProgressDialog("Sending...");
+
             StorageReference storeRef = storage.getReferenceFromUrl("gs://markpollution.appspot.com");
             StorageReference picRef = storeRef.child("images/IMG_" + new SimpleDateFormat("ddMMyyyy_hhmmss").format(new Date())+".jpg");
 
@@ -315,6 +319,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
+                    hideProgressDialog();
                     Toast.makeText(SendReportActivity.this, "Upload image failure", Toast.LENGTH_SHORT).show();
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -334,6 +339,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                             }
                             // return MainActivity and trigger Refresh data
                             MainActivity.triggerRefreshData = true;
+                            hideProgressDialog();
                             finish();
                         }
                     }, new Response.ErrorListener() {
@@ -341,6 +347,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                         public void onErrorResponse(VolleyError error) {
                             Toast.makeText(SendReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                             Log.e("Volley", error.getMessage());
+                            hideProgressDialog();
                             finish();
                         }
                     }){
@@ -363,5 +370,16 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
                 }
             });
         }
+    }
+
+    private void showProgressDialog(String msg){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(msg);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog(){
+        progressDialog.hide();
     }
 }

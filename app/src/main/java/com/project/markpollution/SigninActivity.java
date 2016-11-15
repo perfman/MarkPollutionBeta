@@ -1,5 +1,6 @@
 package com.project.markpollution;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -45,6 +46,7 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
     private String url_checkUserByEmail = "http://indi.com.vn/dev/markpollution/RetrieveUserByEmail.php?email=";
     private String url_retrieve_pollutionPoint = "http://indi.com.vn/dev/markpollution/RetrievePollutionPoint.php";
     private Intent intent;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,16 +193,19 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void getAllPollutionPoint(){
+        showProgressDialog("Loading data...");
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url_retrieve_pollutionPoint, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 intent = new Intent(SigninActivity.this, MainActivity.class);
                 intent.putExtra("po_data", response);
                 signInButton.setVisibility(View.VISIBLE);
+                hideProgressDialog();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                hideProgressDialog();
                 Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Volley", error.getMessage());
             }
@@ -214,5 +219,16 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
         }
+    }
+
+    private void showProgressDialog(String msg){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(msg);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog(){
+        progressDialog.hide();
     }
 }

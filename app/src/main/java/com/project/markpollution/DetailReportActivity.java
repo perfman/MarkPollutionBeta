@@ -615,9 +615,8 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                                             // From twice data changed. Toggle trigger refresh data in MainActivity
                                             MainActivity.triggerRefreshData = true;
 
-                                            // restart AdminActivity to reload data
+                                            // return AdminActivity to reload data
                                             finish();
-                                            startActivity(new Intent(DetailReportActivity.this, AdminActivity.class));
                                         }else {
                                             Toast.makeText(DetailReportActivity.this, response, Toast.LENGTH_SHORT).show();
                                         }
@@ -649,7 +648,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(!isFirstTimeRun){
                     Report report = dataSnapshot.getValue(Report.class);
-                        if(!report.getId_user().equals(getUserID())){
+                        if(!report.getId_user().equals(getUserID()) && report.getId_report().equals(id_po)){
                             alertDialog("This report is removed by administrator. Click OK to return previous screen.");
                         }
                     }
